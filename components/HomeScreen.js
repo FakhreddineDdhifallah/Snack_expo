@@ -14,7 +14,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { CustomCard } from './CustomCard';
 import bus from '../assets/images/bus.png';
 import mrt from '../assets/images/mrt.jpg';
-import logo from '../assets/logo.jpg';
+import logo from '../assets/Anava.png';
 
 export const HomeScreen = () => {
   const nav = useNavigation();
