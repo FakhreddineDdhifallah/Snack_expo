@@ -28,6 +28,7 @@
     "web": {
       "favicon": "./assets/favicon.png"
     },
-     "newArchEnabled": true
+    "newArchEnabled": true,
+    "scheme": "io.expo.transportationui"
   }
 }
