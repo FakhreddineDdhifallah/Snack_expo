@@ -1,3 +1,4 @@
+
 # Anava: Public Transportation Companion for Tunisia
 
 ## Project Overview
@@ -40,6 +41,6 @@ Tunisian commuters face significant challenges in:
 
 
 
-Contributions are welcome! Please read our contribution guidelines before getting started.
+Contributions are not welcome! 
 
 Anava aims to simplify transportation, save time, and improve the commuting experience for Tunisians.
