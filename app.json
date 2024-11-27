@@ -20,15 +20,21 @@
       "supportsTablet": true
     },
     "android": {
+      "package": "io.expo.transportationui",
+      "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
       }
+
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
     "newArchEnabled": true,
     "scheme": "io.expo.transportationui"
+ 
+    
   }
+
 }

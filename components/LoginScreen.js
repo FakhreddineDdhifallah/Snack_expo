@@ -1,3 +1,4 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { useState, useEffect } from "react";
 import {
   View,
@@ -35,20 +36,34 @@ export const LoginScreen = ({ navigation, googleSignInPrompt }) => {
     return Object.keys(validationErrors).length === 0;
   };
 
-  const handleLogin = () => {
-    if (validateForm()) {
-      // Here you would typically make an API call to your backend
-      try {
-        // Simulate login success for now
-        navigation.navigate("home");
-      } catch (error) {
-        Alert.alert(
-          "Login Failed",
-          "Please check your credentials and try again."
-        );
-      }
-    }
-  };
+ const handleLogin = async () => {
+   if (validateForm()) {
+     try {
+       const response = await fetch("http://10.0.2.2:3000/api/users/login", {
+         method: "POST",
+         headers: {
+           "Content-Type": "application/json",
+         },
+         body: JSON.stringify({
+           email,
+           password,
+         }),
+       });
+
+       const data = await response.json();
+
+       if (response.ok) {
+         await AsyncStorage.setItem("userToken", data.token);
+         await AsyncStorage.setItem("userData", JSON.stringify(data.user));
+         navigation.navigate("home");
+       } else {
+         Alert.alert("Login Failed", data.error);
+       }
+     } catch (error) {
+       Alert.alert("Error", "Unable to connect to server");
+     }
+   }
+ };
 
   const handleGoogleSignIn = async () => {
     try {

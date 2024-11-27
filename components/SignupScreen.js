@@ -9,9 +9,11 @@ import {
   KeyboardAvoidingView,
   Platform,
   Image,
+  Alert
 } from "react-native";
 import * as WebBrowser from "expo-web-browser";
 import { makeRedirectUri, useAuthRequest } from "expo-auth-session";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export const SignupScreen = ({ navigation }) => {
   const [fullName, setFullName] = useState("");
@@ -53,25 +55,84 @@ export const SignupScreen = ({ navigation }) => {
     return Object.keys(validationErrors).length === 0;
   };
 
-  const handleSignup = () => {
+  const handleSignup = async () => {
     if (validateForm()) {
-      // Signup logic here
-      console.log("Signup Data:", { fullName, email });
-      navigation.navigate("home");
+      try {
+        const response = await fetch("http://10.0.2.2:3000/api/users/signup", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            fullName,
+            email,
+            password,
+          }),
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          await AsyncStorage.setItem("userToken", data.token);
+          await AsyncStorage.setItem("userData", JSON.stringify(data.user));
+          navigation.navigate("home");
+        } else {
+          Alert.alert("Signup Failed", data.error);
+        }
+      } catch (error) {
+        Alert.alert("Error", "Unable to connect to server");
+      }
     }
   };
 
-  const handleGoogleSignIn = async () => {
-    try {
-      const result = await googleSignInPrompt();
-      if (result.type === "success") {
-        console.log("Google Sign-In Successful:", result);
-        navigation.navigate("home");
-      }
-    } catch (error) {
-      console.error("Google Sign-In Error:", error);
-    }
-  };
+ const handleGoogleSignIn = async () => {
+   try {
+     // Using promptAsync from useAuthRequest hook instead of googleSignInPrompt
+     const result = await promptAsync();
+     if (result?.type === "success") {
+       // Here we should handle the Google sign-in response
+       const { authentication } = result;
+
+       // Call your backend API to verify the Google token
+       try {
+         const response = await fetch(
+           "http://10.0.2.2:3000/api/users/google-auth",
+           {
+             method: "POST",
+             headers: {
+               "Content-Type": "application/json",
+             },
+             body: JSON.stringify({
+               token: authentication.accessToken,
+             }),
+           }
+         );
+
+         const data = await response.json();
+
+         if (response.ok) {
+           // Store user data and token
+           await AsyncStorage.setItem("userToken", data.token);
+           await AsyncStorage.setItem("userData", JSON.stringify(data.user));
+           navigation.navigate("home");
+         } else {
+           Alert.alert(
+             "Sign In Failed",
+             data.error || "Failed to authenticate with Google"
+           );
+         }
+       } catch (error) {
+         Alert.alert("Error", "Unable to connect to server");
+       }
+     }
+   } catch (error) {
+     console.error("Google Sign-In Error:", error);
+     Alert.alert(
+       "Sign In Failed",
+       "An error occurred during Google Sign In. Please try again."
+     );
+   }
+ };
 
   return (
     <KeyboardAvoidingView
@@ -130,7 +191,7 @@ export const SignupScreen = ({ navigation }) => {
 
         <View style={styles.loginContainer}>
           <Text style={styles.loginText}>Already have an account? </Text>
-          <TouchableOpacity onPress={() => navigation.navigate("Login")}>
+          <TouchableOpacity onPress={() => navigation.navigate("login")}>
             <Text style={styles.loginLink}>Login</Text>
           </TouchableOpacity>
         </View>
