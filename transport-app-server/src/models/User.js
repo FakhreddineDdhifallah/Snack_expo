@@ -5,7 +5,7 @@ const userSchema = new mongoose.Schema({
   fullName: { type: String, required: true },
   email: { type: String, required: true, unique: true },
   password: { type: String },
-  googleId: { type: String }, // Optional for Google Sign-In users
+  googleId: { type: String }, 
 });
 
 // Hash password before saving
